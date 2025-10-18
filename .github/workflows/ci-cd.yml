@@ -3,12 +3,9 @@ name: CI/CD Pipeline - Express TypeScript API
 on:
   push:
     branches:
-    - main
+    - master
     - develop
-  pull_request:
-    branches:
-    - main
-    - develop
+  # workflow_dispatch:
 
 env:
   DOCKER_IMAGE: ffiuca/insigna-test-express
