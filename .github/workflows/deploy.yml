@@ -1,0 +1,101 @@
+name: CI/CD Pipeline - Express TypeScript API
+
+on:
+  push:
+    branches:
+    - master
+    - develop
+  # workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: ffiuca/insigna-test-express
+  MONGODB_URI: mongodb://localhost:27017/insigna-users-test
+  JWT_SECRET: test-jwt-secret-for-github-actions
+  JWT_EXPIRES_IN: 24h
+  DOCKERHUB_USERNAME: ffiuca
+  IMAGE_NAME: insigna-test-express
+  DEPLOYMENT_NAME: express-app
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linting (if configured)
+      run: npm run lint || echo "No lint script found"
+      continue-on-error: true
+
+    - name: Run unit tests with coverage
+      run: npm test
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+      continue-on-error: true
+
+    - name: Archive test coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/
+        retention-days: 30
+
+  deploy:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: |
+        pwd
+        ls -la
+        docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:$GITHUB_SHA \
+          -t $DOCKERHUB_USERNAME/$IMAGE_NAME:latest \
+          .
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$GITHUB_SHA
+        docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT_ID }}
+        export_default_credentials: true
+
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE
+
+    - name: Deploy to GKE
+      run: |
+        kubectl apply -f ./k8s-deployment.yaml
+        kubectl rollout status deployment/$DEPLOYMENT_NAME -n insigna-express
+        kubectl get services -n insigna-express -o wide
