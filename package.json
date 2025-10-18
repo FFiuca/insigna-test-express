@@ -12,7 +12,8 @@
     "serve": "node dist/index.js",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "test:verbose": "jest --verbose --coverage"
+    "test:verbose": "jest --verbose --coverage",
+    "lint": "echo 'No linting configured yet'"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

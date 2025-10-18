@@ -2,6 +2,10 @@
 
 A RESTful API built with Node.js, Express, TypeScript, MongoDB, and JWT authentication.
 
+![CI/CD Pipeline](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci-cd.yml/badge.svg)
+![Tests](https://img.shields.io/badge/tests-30%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-82%25-green)
+
 ## Features
 
 - ✅ CRUD operations for user management
@@ -13,12 +17,17 @@ A RESTful API built with Node.js, Express, TypeScript, MongoDB, and JWT authenti
 - ✅ Proper error handling and HTTP status codes
 - ✅ Comprehensive unit tests with Jest
 - ✅ **Interactive Swagger/OpenAPI documentation**
+- ✅ **Docker containerization**
+- ✅ **Kubernetes deployment**
+- ✅ **CI/CD with GitHub Actions**
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - MongoDB (local or Atlas)
 - npm or yarn
+- Docker (for containerization)
+- Kubernetes cluster (for deployment)
 
 ## Installation
 
@@ -76,6 +85,55 @@ This provides:
 ```
 http://localhost:3000/api-docs.json
 ```
+
+## 🐳 Docker
+
+### Build Docker image
+```bash
+docker build -t ffiuca/insigna-test-express:latest .
+```
+
+### Run with Docker
+```bash
+docker run -p 3000:3000 \
+  -e MONGODB_URI=mongodb://host.docker.internal:27017/insigna-users \
+  -e JWT_SECRET=your-secret-key \
+  ffiuca/insigna-test-express:latest
+```
+
+### Push to Docker Hub
+```bash
+docker push ffiuca/insigna-test-express:latest
+```
+
+## ☸️ Kubernetes Deployment
+
+### Deploy to Kubernetes
+```bash
+kubectl apply -f k8s-deployment.yaml
+```
+
+### Check deployment status
+```bash
+kubectl get pods -n insigna-express
+kubectl get services -n insigna-express
+```
+
+### Access the API
+```bash
+kubectl port-forward svc/svc-express 3000:80 -n insigna-express
+```
+
+## 🚀 CI/CD Pipeline
+
+This project includes a comprehensive GitHub Actions workflow that:
+
+1. **Tests** - Runs 30 unit tests with 82% coverage
+2. **Builds** - Creates Docker image and pushes to Docker Hub
+3. **Deploys** - Deploys to Kubernetes cluster
+4. **Security** - Scans for vulnerabilities
+
+See [GitHub Actions Setup](.github/GITHUB_ACTIONS.md) for configuration details.
 
 ## API Endpoints
 
@@ -319,6 +377,9 @@ curl -X GET http://localhost:3000/api/users \
 - **Supertest** - HTTP assertions
 - **Swagger/OpenAPI** - API documentation
 - **MongoDB Memory Server** - In-memory database for tests
+- **Docker** - Containerization
+- **Kubernetes** - Container orchestration
+- **GitHub Actions** - CI/CD pipeline
 
 ## Security Features
 
@@ -328,6 +389,17 @@ curl -X GET http://localhost:3000/api/users \
 - Input validation to prevent injection attacks
 - Unique email constraint
 - Environment variable protection
+- Security scanning in CI/CD pipeline
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+The CI/CD pipeline will automatically run tests on your PR!
 
 ## License
 

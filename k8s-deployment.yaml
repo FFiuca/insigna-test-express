@@ -93,7 +93,7 @@ metadata:
   name: secret-express
   namespace: insigna-express
 type: Opaque
-data:
+stringData:
   MONGODB_URI: "mongodb://admin:password@svc-mongodb.insigna-express.svc.cluster.local:27017/insigna-users?authSource=admin"
-  JWT_SECRET: "insigna-jwt-secret"
-  MONGODB_URI_TEST: "mongodb://admin:password@svc-mongodb.insigna-express.svc.cluster.local:27017/insigna-users-test"
+  JWT_SECRET: "insigna-jwt-secret-change-in-production"
+  MONGODB_URI_TEST: "mongodb://admin:password@svc-mongodb.insigna-express.svc.cluster.local:27017/insigna-users-test?authSource=admin"
