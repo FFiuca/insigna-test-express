@@ -58,6 +58,7 @@ jobs:
 
   deploy:
     name: Deploy to GKE
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
